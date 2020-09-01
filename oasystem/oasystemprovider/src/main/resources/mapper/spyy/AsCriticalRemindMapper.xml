@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.julong.enterpriseeureka.spyy.mapper.AsCriticalRemindMapper">
+
+    <!--危急值提醒-->
+<!--    select *-->
+<!--    from AS_CRITICAL_REMIND-->
+<!--    where-->
+<!--    REQ_DATE = #{date}-->
+<!--    and REP_DATE = #{date}-->
+<!--    and AS_CRITICAL_REMIND.READ_FLAG = 'F'-->
+    <select id="getList" resultType="com.julong.enterpriseeureka.spyy.entity.CriciticalRemindVO" parameterType="string">
+
+                SELECT
+                cr.REP_NO as "repNo" ,
+                cr.REQ_NO as "reqNo" ,
+                re.NAME as  "name" ,
+                re.PID as  "pid" ,
+                cr.SEX as  "sex" ,
+                cr.DEPT_CODE as "deptCode"  ,
+                de.DEPT_NAME as  "deptName" ,
+                cr.OPER_NO as  "operNo" ,
+                cr.ROOM_CODE as  "roomCode" ,
+                cr.REQ_DR as  "reqDr" ,
+                op.OPER_NAME as  "operName" ,
+                cr.REQ_DATE as  "reqDate" ,
+                cr.REP_DATE as "repDate" ,
+                cr.READER as "reader" ,
+                cr.GROUP_CODE as "groupCode" ,
+                cr.CRITICAL_NOTE as "criticalNote"
+
+            FROM
+                AS_CRITICAL_REMIND cr,
+                AS_REPORT re,
+                CODE_DEPARTMENT de,
+                CODE_OPERATOR op
+            WHERE
+                cr.READ_FLAG = 'F'
+            AND cr.REP_NO = re.REP_NO
+            AND cr.DEPT_CODE = de.DEPT_CODE
+            AND cr.REQ_DR = op.OPER_CODE
+
+    </select>
+
+</mapper>

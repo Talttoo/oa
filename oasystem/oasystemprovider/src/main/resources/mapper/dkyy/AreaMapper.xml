@@ -1,0 +1,433 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.julong.enterpriseeureka.spyy.mapper.AreaMapper">
+
+    <!--门诊动态-->
+
+    <!--急诊人数-->
+    <select id="getJiZhenRenShu" resultType="java.lang.String" parameterType="string">
+
+        select count(*)
+        from CL_REGISTER
+        where dept_code in (
+                            '0101', '010101', '010102'
+            )
+          and REG_DATE = #{shijian}
+          and CL_REGISTER.DIAG_FLAG = 2
+
+
+    </select>
+
+    <!--门诊人数-->
+    <select id="getMenZhenRenShu" resultType="java.lang.String" parameterType="string">
+        select count(*)
+        from CL_REGISTER
+        where dept_code not in (
+            select DEPT_CODE
+            from CODE_DEPARTMENT
+            where DEPT_NAME like '%急诊%'
+        )
+          and REG_DATE = #{shijian}
+
+
+    </select>
+
+    <!--总人数-->
+    <select id="getZonRenShu" resultType="java.lang.String" parameterType="string">
+
+        select count(*)
+        from CL_REGISTER
+        where REG_DATE = #{shijian}
+          and CL_REGISTER.DIAG_FLAG = 2
+
+    </select>
+
+
+    <!-- 处方 总金额-->
+    <select id="getChuFangZonJinE" resultType="java.lang.String" parameterType="string">
+
+        select case when sum(CL_RECENTRY.TOTAL) is null then 0 else sum(CL_RECENTRY.TOTAL) end
+        from CL_RECIPE
+                 join CL_RECENTRY on CL_RECIPE.REC_NO = CL_RECENTRY.REC_NO
+        where REC_DATE = #{shijian}
+
+
+    </select>
+
+    <!--    处方  处方数   -->
+    <select id="getChuFangShu" resultType="java.lang.String" parameterType="string">
+
+        select count(CL_RECIPE.REC_NO)
+        from CL_RECIPE
+        where REC_DATE = #{shijian}
+
+    </select>
+
+
+    <select id="getZonshouRu" resultType="java.lang.String" parameterType="string">
+
+        select SUM(TOTAL_SUM)
+        from CL_CHARGE
+                 join CL_CHRGENTRY
+                      on CL_CHARGE.CHRG_NO = CL_CHRGENTRY.CHRG_NO
+        where CHRG_DATE = #{shijian}
+          and CL_CHARGE.status = '1'
+
+
+    </select>
+
+
+    <select id="getYaopinshouRu" resultType="java.lang.String" parameterType="string">
+        select sum(CL_RECENTRY.total)
+        from CL_RECIPE
+                 join CL_RECENTRY on CL_RECIPE.REC_NO = CL_RECENTRY.REC_NO
+                 join CL_CHARGE_RECIPE on CL_RECENTRY.REC_NO = CL_CHARGE_RECIPE.REC_NO
+                 join CL_CHARGE on CL_CHARGE_RECIPE.CHRG_NO = CL_CHARGE.CHRG_NO
+                 join CODE_ITEM on CL_RECENTRY.ITEM_CODE = CODE_ITEM.ITEM_CODE
+        where CODE_ITEM.ITEM_CLS in ('1', '2', '3')
+          and CL_CHARGE_RECIPE.TYPE = '2'
+          and CHRG_DATE = #{shijian}
+
+
+    </select>
+
+
+    <!--住院动态-->
+    <!--人数-->
+    <!--在院人数-->
+    <select id="getZaiYuan" resultType="java.lang.String" parameterType="string">
+
+        select sum(QRY_IP_BED_DAILY.PAT_ORIGINAL_SUM)  from QRY_IP_BED_DAILY
+        where  to_date(DATE_DAILY,'yyyy-MM-dd') =  to_date(#{shijian},'yyyy-MM-dd')
+
+    </select>
+
+    <!--入院人数-->
+    <select id="getZhuYuan" resultType="java.lang.String" parameterType="string">
+
+        select sum(in_num)  from QRY_IP_BED_DAILY
+        where  to_date(DATE_DAILY,'yyyy-MM-dd') =  to_date(#{riqi},'yyyy-MM-dd')
+
+
+    </select>
+
+    <!--出院人数-->
+    <select id="getChuYuan" resultType="java.lang.String" parameterType="string">
+
+        select sum(out_num)  from QRY_IP_BED_DAILY
+        where  to_date(DATE_DAILY,'yyyy-MM-dd') =  to_date(#{riqi},'yyyy-MM-dd')
+
+
+    </select>
+
+    <!-- 危机病人 -->
+    <select id="getWeiJi" resultType="java.lang.String" parameterType="string">
+        <![CDATA[
+        select ICU_NUM from QRY_IP_BED_DAILY where to_date(DATE_DAILY,'yyyy-MM-dd') =  to_date(#{shijian},'yyyy-MM-dd') and ROWNUM  <=1
+           ]]>
+    </select>
+
+
+    <!--床位-->
+    <select id="getShiYongChuangWei" resultType="java.lang.String" >
+        select sum(in_total_num) from QRY_IP_BED_DAILY
+        where  to_date(DATE_DAILY,'yyyy-MM-dd') =  to_date(#{shijian,jdbcType=VARCHAR},'yyyy-MM-dd')
+    </select>
+    <!--床位-->
+<!--
+    <select id="getShiYongChuangWei" resultType="java.lang.String" parameterType="string">
+
+        select count(BED_CODE)
+        from IP_PATIENT
+        where IN_DATE &lt;= #{shijian}
+          and out_date &gt;= #{shijian}
+
+    </select>
+-->
+
+    <!--编制床位-->
+    <select id="getBZChuangWei" resultType="java.lang.String">
+        select sum(total_num) from QRY_IP_BED_DAILY
+        where  to_date(DATE_DAILY,'yyyy-MM-dd') =  to_date(#{shijian},'yyyy-MM-dd')
+    </select>
+
+    <!--门诊科室收入分类汇总报表-->
+    <select id="getMenzhenKeShiShouRu" resultType="com.julong.enterpriseeureka.vo.MenZhenShouRuReturn">
+
+
+        select libiao.*,
+               heji - (xiyao + huli + huayan + jiancha + weisheng + zhencha + zhiliao + zhongcao + chuangwei) as qita
+
+
+        from (
+                 select dept_name,
+                        sum(case when CLS_NAME = '西药' then TOTAL_SUM else 0 end)     as xiyao,
+                        sum(case when CLS_NAME = '合计' then TOTAL_SUM else 0 end)     as heji,
+                        sum(case when CLS_NAME = '护理收入' then TOTAL_SUM else 0 end)   as huli,
+                        sum(case when CLS_NAME = '化验收入' then TOTAL_SUM else 0 end)   as huayan,
+                        sum(case when CLS_NAME = '检查收入' then TOTAL_SUM else 0 end)   as jiancha,
+
+                        sum(case when CLS_NAME = '卫生材料收入' then TOTAL_SUM else 0 end) as weisheng,
+                        sum(case when CLS_NAME = '诊查收入' then TOTAL_SUM else 0 end)   as zhencha,
+                        sum(case when CLS_NAME = '治疗收入' then TOTAL_SUM else 0 end)   as zhiliao,
+                        sum(case when CLS_NAME = '中草药' then TOTAL_SUM else 0 end)    as zhongcao,
+                        sum(case when CLS_NAME = '床位收入' then TOTAL_SUM else 0 end)   as chuangwei
+
+
+                 from (
+                          select sum(total_sum) as total_sum,
+                                 cls_code,
+                                 cls_name,
+                                 dept_code,
+                                 dept_name
+                          from (
+                                   select a.basic_cls,
+                                          a.dept_code,
+                                          (select code_department.dept_name
+                                           from code_department
+                                           where code_department.dept_code = a.dept_code) as dept_name,
+                                          a.total_sum,
+                                          b.cls_code,
+                                          c.cls_name
+                                   from cl_chrgentry a,
+                                        def_itemcls_basiccls b,
+                                        code_itemcls c,
+                                        cl_charge d
+                                   where d.chrg_no = a.chrg_no
+                                     and a.basic_cls = b.basic_cls
+                                     and b.scope = c.scope
+                                     and b.cls_code = c.cls_code
+                                     and b.cls_type = c.cls_type
+                                     and a.type = d.type
+                                     and b.scope = '1'
+                                     and b.cls_type = '^'
+                                     and d.status = '1'
+                                     and a.dept_code in ('07','13','01','11','12','36','10'   )
+                                     and d.chrg_date between '${begintime}' and '${endtime}'
+                               )
+                          group by cls_code,
+                                   cls_name,
+                                   dept_code,
+                                   dept_name
+
+
+                          union all
+                          select sum(total_sum) as total_sum,
+                                 cls_code,
+                                 cls_name,
+                                 dept_code,
+                                 dept_name
+                          from (
+                                   select a.total_sum,
+                                          a.basic_cls,
+                                          c.cls_name,
+                                          '-'   as dept_code,
+                                          '.合计' as dept_name,
+                                          b.cls_code
+                                   from cl_chrgentry a,
+                                        def_itemcls_basiccls b,
+                                        code_itemcls c,
+                                        cl_charge d
+                                   where d.chrg_no = a.chrg_no
+                                     and a.basic_cls = b.basic_cls
+                                     and b.scope = c.scope
+                                     and b.cls_code = c.cls_code
+                                     and b.cls_type = c.cls_type
+                                     and a.type = d.type
+                                     and b.scope = '1'
+                                     and b.cls_type = '^'
+                                     and d.status = '1'
+                                     and a.dept_code in
+                                         (select DEPT_CODE from CODE_DEPARTMENT where DEPT_NAME like '%科')
+                                     and a.dept_code in ('07','13','01','11','12','36','10' )
+                                     and d.chrg_date between '${begintime}' and '${endtime}'
+                               )
+                          group by cls_code,
+                                   cls_name,
+                                   dept_code,
+                                   dept_name
+
+
+                          union all
+                          select count(distinct reg_no) as total_sum,
+                                 cls_code,
+                                 cls_name,
+                                 dept_code,
+                                 dept_name
+                          from (
+                                   select 'z'                                             as cls_code,
+                                          '.门诊人次'                                         as cls_name,
+                                          a.dept_code,
+                                          (select code_department.dept_name
+                                           from code_department
+                                           where code_department.dept_code = a.dept_code) as dept_name,
+                                          d.reg_no
+                                   from cl_chrgentry a,
+                                        cl_charge b,
+                                        cl_charge_recipe c,
+                                        cl_recipe d
+                                   where a.chrg_no = b.chrg_no
+                                     and b.chrg_no = c.chrg_no
+                                     and c.rec_no = d.rec_no
+                                     and a.type = b.type
+                                     and b.status = '1'
+                                     and a.dept_code in
+                                         (select DEPT_CODE from CODE_DEPARTMENT where DEPT_NAME like '%科')
+                                     and a.dept_code in (
+                                       '07','13','01','11','12','36','10'
+                                   )
+                                     and b.chrg_date between '${begintime}' and '${endtime}'
+                               )
+                          group by cls_code,
+                                   cls_name,
+                                   dept_code,
+                                   dept_name
+
+                          union all
+
+                          select sum(basic_sum) as total_sum,
+                                 cls_code,
+                                 cls_name,
+                                 '-'            as dept_code,
+                                 '.合计'          as dept_name
+                          from (
+                                   select count(distinct reg_no) as basic_sum,
+                                          cls_code,
+                                          cls_name,
+                                          dept_code,
+                                          dept_name
+                                   from (
+                                            select 'z'                                             as cls_code,
+                                                   '.门诊人次'                                         as cls_name,
+                                                   a.dept_code,
+                                                   (select code_department.dept_name
+                                                    from code_department
+                                                    where code_department.dept_code = a.dept_code) as dept_name,
+                                                   d.reg_no
+                                            from cl_chrgentry a,
+                                                 cl_charge b,
+                                                 cl_charge_recipe c,
+                                                 cl_recipe d
+                                            where a.chrg_no = b.chrg_no
+                                              and b.chrg_no = c.chrg_no
+                                              and c.rec_no = d.rec_no
+                                              and a.type = b.type
+                                              and b.status = '1'
+                                              and a.dept_code in (
+                                                '07','13','01','11','12','36','10'
+                                            )
+                                              and a.dept_code in
+                                                  (select DEPT_CODE from CODE_DEPARTMENT where DEPT_NAME like '%科')
+                                              and b.chrg_date between '${begintime}' and '${endtime}'
+                                        )
+                                   group by cls_code,
+                                            cls_name,
+                                            dept_code,
+                                            dept_name
+                               )
+                          group by cls_code,
+                                   cls_name,
+                                   dept_code,
+                                   dept_name
+                      )
+
+                 GROUP BY DEPT_NAME
+             ) libiao
+
+        order by dept_name desc
+    </select>
+    <select id="getZhuShouRu" resultType="com.julong.enterpriseeureka.vo.ZhuYuanShouRuReturn">
+
+
+        select libiao.*,
+               heji -
+               (xiyao + huli + huayan + jiancha + weisheng + zhencha + zhiliao + zhongcao + chuangwei) as qita
+        from (select DEPT_NAME
+                      ,
+
+                     sum(case when CLS_NAME = '西药收入' then TOTAL_SUM else 0 end)   as xiyao,
+
+                     sum(case when CLS_NAME = '护理收入' then TOTAL_SUM else 0 end)   as huli,
+                     sum(case when CLS_NAME = '化验收入' then TOTAL_SUM else 0 end)   as huayan,
+                     sum(case when CLS_NAME = '检查收入' then TOTAL_SUM else 0 end)   as jiancha,
+
+                     sum(case when CLS_NAME = '卫生材料收入' then TOTAL_SUM else 0 end) as weisheng,
+                     sum(case when CLS_NAME = '诊查收入' then TOTAL_SUM else 0 end)   as zhencha,
+                     sum(case when CLS_NAME = '治疗收入' then TOTAL_SUM else 0 end)   as zhiliao,
+                     sum(case when CLS_NAME = '中草药' then TOTAL_SUM else 0 end)    as zhongcao,
+                     sum(case when CLS_NAME = '床位收入' then TOTAL_SUM else 0 end)   as chuangwei,
+
+                     sum(case when CLS_NAME = '合计' then TOTAL_SUM else 0 end)     as heji
+              from (
+                       select sum(total_sum) as total_sum,
+                              cls_code,
+                              cls_name,
+                              dept_code,
+                              dept_name
+                       from (select a.basic_cls,
+                                    a.dept_code,
+                                    (select code_department.dept_name
+                                     from code_department
+                                     where code_department.dept_code = a.dept_code) as dept_name,
+                                    a.total                                         as total_sum,
+                                    b.cls_code,
+                                    c.cls_name
+                             from ip_bill a,
+                                  def_itemcls_basiccls b,
+                                  code_itemcls c
+                             where a.basic_cls = b.basic_cls
+                               and b.scope = c.scope
+                               and b.cls_code = c.cls_code
+                               and b.cls_type = c.cls_type
+                               and b.scope = '2'
+                               and b.cls_type = '^'
+                               and a.bill_date between '${begintime}' and '${endtime}'
+                            )
+                       group by cls_code,
+                                cls_name,
+                                dept_code,
+                                dept_name
+
+
+                       union all
+
+                       select sum(total_sum) as total_sum,
+                              cls_code,
+                              cls_name,
+                              dept_code,
+                              dept_name
+                       from (
+                                select a.total as total_sum,
+                                       a.basic_cls,
+                                       c.cls_name,
+                                       '-'     as dept_code,
+                                       '.合计'   as dept_name,
+                                       b.cls_code
+                                from ip_bill a,
+                                     def_itemcls_basiccls b,
+                                     code_itemcls c
+                                where a.basic_cls = b.basic_cls
+                                  and b.scope = c.scope
+                                  and b.cls_code = c.cls_code
+                                  and b.cls_type = c.cls_type
+                                  and b.scope = '2'
+                                  and b.cls_type = '^'
+
+
+                                  and a.bill_date BETWEEN '${begintime}' and '${endtime}'
+                            )
+                       group by cls_code,
+                                cls_name,
+                                dept_code,
+                                dept_name
+                   )
+              GROUP BY DEPT_NAME
+             ) libiao
+
+        order by dept_name desc
+
+
+    </select>
+
+
+</mapper>

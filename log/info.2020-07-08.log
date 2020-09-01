@@ -1,0 +1,4 @@
+2020-07-08 07 15:34:43 === [main] === INFO  === c.j.enterpriseeureka.OaSystemProviderApplication ==== No active profile set, falling back to default profiles: default - 646 
+2020-07-08 07 15:34:50 === [main] === INFO  === c.j.enterpriseeureka.OaSystemProviderApplication ==== Started OaSystemProviderApplication in 10.397 seconds (JVM running for 11.7) - 59 
+2020-07-08 07 15:52:41 === [main] === INFO  === c.j.enterpriseeureka.OaSystemProviderApplication ==== No active profile set, falling back to default profiles: default - 646 
+2020-07-08 07 15:52:52 === [main] === INFO  === c.j.enterpriseeureka.OaSystemProviderApplication ==== Started OaSystemProviderApplication in 16.467 seconds (JVM running for 18.047) - 59 

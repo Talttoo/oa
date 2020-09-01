@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/enterprisezuul/enterprisezuul.iml" filepath="$PROJECT_DIR$/enterprisezuul/enterprisezuul.iml" />
+      <module fileurl="file://$PROJECT_DIR$/oa.iml" filepath="$PROJECT_DIR$/oa.iml" />
+      <module fileurl="file://$PROJECT_DIR$/oaeureka/oaeureka.iml" filepath="$PROJECT_DIR$/oaeureka/oaeureka.iml" />
+      <module fileurl="file://$PROJECT_DIR$/oasystem/oasystem.iml" filepath="$PROJECT_DIR$/oasystem/oasystem.iml" />
+      <module fileurl="file://$PROJECT_DIR$/oasystem/oasystemconsumer/oasystemconsumer.iml" filepath="$PROJECT_DIR$/oasystem/oasystemconsumer/oasystemconsumer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/oasystem/oasystemprovider/oasystemprovider.iml" filepath="$PROJECT_DIR$/oasystem/oasystemprovider/oasystemprovider.iml" />
+      <module fileurl="file://$PROJECT_DIR$/oazuul/oazuul.iml" filepath="$PROJECT_DIR$/oazuul/oazuul.iml" />
+    </modules>
+  </component>
+</project>

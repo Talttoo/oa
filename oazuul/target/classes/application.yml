@@ -1,0 +1,55 @@
+
+server:
+  port: 9527
+
+spring:
+  application:
+    name: microservicecloud-zuul-gateway
+
+eureka:
+  client:
+    service-url:
+#      defaultZone: http://192.168.0.151:8761/eureka/
+#      defaultZone: http://10.38.12.51:8762/eureka/
+#      defaultZone: http://192.168.0.103:8761/eureka/
+      defaultZone: http://127.0.0.1:8761/eureka/
+  enable: true
+  instance:
+    instance-id: gateway-9527.com
+    prefer-ip-address: true
+
+zuul:
+  host:
+    connect-timeout-millis: 18000 #HTTP连接超时要比Hystrix的大
+    socket-timeout-millis: 80000   #socket超时
+  routes:
+    static:
+      path: /static/**
+      url: http://localhost:9090/static/
+
+    oaservice: # 通过服务名serviceId路由，不通过具体的url
+      serviceId: oaservice
+      #默认敏感头是"Cookie", "Set-Cookie", "Authorization"这三项,取消这三项，向下游服务请求带上这些headers
+      #Access-Control-Allow-Origin,Access-Control-Allow-Methods 解决其他服务的js向zuul发起请求的跨域问题
+      sensitiveHeaders: Access-Control-Allow-Origin,Access-Control-Allow-Methods
+#      sensitiveHeaders: Cookie,Set-Cookie,Authorization
+ribbon:
+  ReadTimeout: 10000
+  ConnectTimeout: 10000
+
+
+#zuul:
+#  #ignored-services: microservicecloud-dept
+#  prefix: /atguigu
+#  ignored-services: "*"
+#  routes:
+#    mydept.serviceId: microservicecloud-dept
+#    mydept.path: /mydept/**
+
+info:
+  app.name: atguigu-microcloud
+  company.name: www.atguigu.com
+
+
+
+

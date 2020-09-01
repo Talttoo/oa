@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: com.oracle:sdk-java:07">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/oracle/sdk-java/07/sdk-java-07.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/com/oracle/sdk-java/07/sdk-java-07-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/oracle/sdk-java/07/sdk-java-07-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

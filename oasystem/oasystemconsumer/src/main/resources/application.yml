@@ -1,0 +1,15 @@
+server:
+  port: 8010
+
+spring:
+  application:
+    name: oaconsumer
+#  profiles:
+#    main:
+#      allow-bean-definition-overriding: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  enable: true
